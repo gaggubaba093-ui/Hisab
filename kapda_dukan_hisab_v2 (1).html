@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#7c2d12">
+<title>कपड़ा दुकान हिसाब</title>
+<style>
+:root{--brand:#7c2d12;--brand2:#c2410c;--bg:#fff7ed;--text:#1f2937;--muted:#6b7280;--line:#fed7aa;--green:#15803d;--red:#b91c1c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:linear-gradient(135deg,var(--brand),var(--brand2));color:white;padding:20px 16px 24px;border-radius:0 0 22px 22px}
+header h1{font-size:23px;margin:0 0 5px}header p{margin:0;font-size:13px;opacity:.9}
+main{max-width:900px;margin:auto;padding:14px;display:grid;gap:14px}.card{background:white;border:1px solid var(--line);border-radius:16px;padding:15px;box-shadow:0 3px 12px #7c2d1210}
+h2{font-size:17px;margin:0 0 12px}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{padding:13px;border-radius:12px;background:#fff7ed;border:1px solid #ffedd5}.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;font-size:20px;margin-top:4px;overflow-wrap:anywhere}
+form{display:grid;grid-template-columns:1fr 1fr;gap:11px}label{font-size:13px;font-weight:650;display:grid;gap:5px}
+input,select,button{font:inherit}input,select{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:10px;background:white;min-width:0;color:var(--text)}input[type=file]{padding:8px;font-size:12px}
+.full{grid-column:1/-1}.hint{font-size:12px;color:var(--muted);margin:7px 0 0}
+button{border:0;border-radius:10px;padding:11px 13px;cursor:pointer;font-weight:700}.primary{background:var(--brand);color:white}.secondary{background:#ffedd5;color:var(--brand)}.danger{background:#fee2e2;color:var(--red)}.small{font-size:12px;padding:8px 10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.history-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+#historyList{display:grid;gap:10px}.entry{border:1px solid #e5e7eb;border-radius:13px;padding:11px;display:grid;grid-template-columns:84px 1fr;gap:11px;min-width:0}
+.entry img{width:84px;height:100px;object-fit:cover;border-radius:9px;background:#f3f4f6}.entry h3{font-size:15px;margin:0 0 4px;overflow-wrap:anywhere}.entry p{font-size:12px;margin:3px 0;color:var(--muted);overflow-wrap:anywhere}.entry .money{font-weight:800;color:var(--green);font-size:15px}.entry .actions{margin-top:8px}.empty{text-align:center;padding:25px 10px;color:var(--muted);font-size:14px}
+@media(min-width:700px){main{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:380px){form{grid-template-columns:1fr}.full{grid-column:auto}.entry{grid-template-columns:68px 1fr}.entry img{width:68px;height:88px}.stat strong{font-size:18px}}
+</style>
+</head>
+<body>
+<header><h1>🛍️ कपड़ा दुकान हिसाब</h1><p>सेल • कैश • ऑनलाइन पेमेंट • स्टॉक • फोटो हिस्ट्री</p></header>
+<main>
+<section class="card wide">
+<h2>📊 कुल हिसाब</h2><div class="stats">
+<div class="stat"><span>कुल बिक्री</span><strong id="totalSales">₹0</strong></div>
+<div class="stat"><span>कैश आया</span><strong id="totalCash">₹0</strong></div>
+<div class="stat"><span>ऑनलाइन आया</span><strong id="totalOnline">₹0</strong></div>
+<div class="stat"><span>अनुमानित मुनाफा</span><strong id="totalProfit">₹0</strong></div>
+</div><p class="hint" id="stockSummary">स्टॉक: 0 पीस</p>
+</section>
+<section class="card">
+<h2>➕ नया सेल रिकॉर्ड</h2>
+<form id="saleForm">
+<label>कपड़े का नाम<input name="product" required placeholder="जैसे: वन पीस"></label>
+<label>कितने पीस बेचे<input name="qty" type="number" min="1" step="1" value="1" required></label>
+<label>एक पीस की बिक्री कीमत (₹)<input name="price" type="number" min="0" step="0.01" required placeholder="150"></label>
+<label>एक पीस की खरीद कीमत (₹)<input name="cost" type="number" min="0" step="0.01" value="0"></label>
+<label>पेमेंट का तरीका<select name="payment"><option value="cash">कैश</option><option value="online">ऑनलाइन / UPI</option><option value="mixed">कैश + ऑनलाइन</option><option value="credit">उधार / बाकी</option></select></label>
+<label>कैश में मिला (₹)<input name="cash" type="number" min="0" step="0.01" value="0"></label>
+<label>ऑनलाइन मिला (₹)<input name="online" type="number" min="0" step="0.01" value="0"></label>
+<label>बाकी / उधार (₹)<input name="due" type="number" min="0" step="0.01" value="0"></label>
+<label class="full">कपड़े की फोटो (गैलरी से चुनें)<input name="image" type="file" accept="image/*"></label>
+<label class="full">नोट / ग्राहक का नाम (वैकल्पिक)<input name="note" placeholder="ग्राहक या अतिरिक्त जानकारी"></label>
+<div class="full"><button class="primary" type="submit" style="width:100%">सेल सेव करें</button><p class="hint">कुल बिक्री = पीस × बिक्री कीमत। कैश + ऑनलाइन + बाकी की रकम कुल बिक्री के बराबर रखें।</p></div>
+</form></section>
+<section class="card">
+<h2>📦 स्टॉक जोड़ें</h2><form id="stockForm">
+<label class="full">कपड़े का नाम<input name="product" required placeholder="जैसे: शर्ट"></label>
+<label>पीस की संख्या<input name="qty" type="number" min="1" step="1" required></label>
+<label>एक पीस की खरीद कीमत (₹)<input name="cost" type="number" min="0" step="0.01" value="0"></label>
+<label class="full">फोटो (वैकल्पिक)<input name="image" type="file" accept="image/*"></label>
+<div class="full"><button class="secondary" type="submit" style="width:100%">स्टॉक सेव करें</button></div>
+</form><p class="hint">स्टॉक जोड़ने और बेचने के रिकॉर्ड से अनुमानित बचे हुए पीस दिखेंगे।</p>
+</section>
+<section class="card wide">
+<div class="history-head"><h2 style="margin:0">🕘 हिस्ट्री</h2><div class="actions"><button id="exportBtn" class="secondary small" type="button">CSV डाउनलोड</button><button id="clearBtn" class="danger small" type="button">सारी हिस्ट्री हटाएँ</button></div></div>
+<div class="filters"><input id="searchBox" placeholder="नाम से खोजें…"><select id="typeFilter"><option value="all">सभी रिकॉर्ड</option><option value="sale">सिर्फ सेल</option><option value="stock">सिर्फ स्टॉक</option></select></div>
+<div id="historyList"><div class="empty">हिस्ट्री लोड हो रही है…</div></div>
+<p class="hint">रिकॉर्ड इसी ब्राउज़र में सेव होते हैं। ब्राउज़र का डेटा साफ़ करने या फोन बदलने पर डेटा खो सकता है। बैकअप के लिए समय-समय पर CSV डाउनलोड करें। CSV में फोटो नहीं होती, केवल रिकॉर्ड का विवरण होता है।</p>
+</section>
+</main><footer style="text-align:center;color:#6b7280;font-size:11px;padding:5px 14px 24px">कपड़ा दुकान हिसाब • मोबाइल के लिए बनाया गया</footer>
+<script>
+const DB_NAME='KapdaDukanHisabDB',DB_VERSION=1,STORE='records';let db;
+const $=s=>document.querySelector(s);
+const rupees=n=>'₹'+(Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const nowISO=()=>new Date().toISOString();
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains(STORE)){const st=d.createObjectStore(STORE,{keyPath:'id',autoIncrement:true});st.createIndex('createdAt','createdAt');}};req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error);});}
+function allRecords(){return new Promise((resolve,reject)=>{const req=db.transaction(STORE,'readonly').objectStore(STORE).getAll();req.onsuccess=()=>resolve(req.result.sort((a,b)=>b.createdAt.localeCompare(a.createdAt)));req.onerror=()=>reject(req.error);});}
+function saveRecord(record){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).add(record);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});}
+function deleteRecord(id){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(Number(id));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});}
+function clearRecords(){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).clear();tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});}
+function readImage(file){return new Promise((resolve,reject)=>{if(!file){resolve(null);return;}if(!file.type.startsWith('image/')){reject(new Error('कृपया इमेज फ़ाइल चुनें।'));return;}const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('फोटो पढ़ी नहीं जा सकी।'));reader.readAsDataURL(file);});}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function dateText(iso){try{return new Date(iso).toLocaleString('hi-IN',{dateStyle:'medium',timeStyle:'short'});}catch{return iso;}}
+async function refresh(){
+ const records=await allRecords(),sales=records.filter(r=>r.type==='sale');
+ $('#totalSales').textContent=rupees(sales.reduce((s,r)=>s+r.total,0));
+ $('#totalCash').textContent=rupees(sales.reduce((s,r)=>s+r.cash,0));
+ $('#totalOnline').textContent=rupees(sales.reduce((s,r)=>s+r.online,0));
+ $('#totalProfit').textContent=rupees(sales.reduce((s,r)=>s+(r.total-r.qty*r.cost),0));
+ const stock={};records.filter(r=>r.type==='stock').forEach(r=>stock[r.product]=(stock[r.product]||0)+r.qty);sales.forEach(r=>stock[r.product]=(stock[r.product]||0)-r.qty);
+ const st=Object.entries(stock).filter(([k,v])=>v!==0).map(([k,v])=>`${k}: ${v} पीस`).join(' • ');
+ $('#stockSummary').textContent='स्टॉक अनुमान: '+(st||'कोई स्टॉक रिकॉर्ड नहीं है');renderHistory(records);
+}
+function renderHistory(records){
+ const q=$('#searchBox').value.trim().toLowerCase(),type=$('#typeFilter').value;
+ const filtered=records.filter(r=>(type==='all'||r.type===type)&&(`${r.product} ${r.note||''}`).toLowerCase().includes(q)),list=$('#historyList');
+ if(!filtered.length){list.innerHTML='<div class="empty">कोई रिकॉर्ड नहीं मिला। नया रिकॉर्ड जोड़ें।</div>';return;}
+ list.innerHTML=filtered.map(r=>{
+ const img=r.image?`<img src="${r.image}" alt="कपड़े की फोटो">`:`<div style="width:84px;height:100px;display:grid;place-items:center;background:#fff7ed;border-radius:9px;font-size:30px">👕</div>`;
+ const isSale=r.type==='sale';
+ const details=isSale?`<p>पीस: ${r.qty} × ${rupees(r.price)}</p><p>पेमेंट: ${esc(r.paymentLabel)} • कैश ${rupees(r.cash)} • ऑनलाइन ${rupees(r.online)} • बाकी ${rupees(r.due)}</p><div class="money">कुल: ${rupees(r.total)} · अनुमानित मुनाफा: ${rupees(r.total-r.qty*r.cost)}</div>`:`<p>स्टॉक में जोड़े: ${r.qty} पीस</p><p>खरीद कीमत: ${rupees(r.cost)} प्रति पीस</p>`;
+ return `<article class="entry">${img}<div><h3>${isSale?'🧾 सेल':'📦 स्टॉक'} — ${esc(r.product)}</h3><p>${dateText(r.createdAt)}</p>${details}${r.note?`<p>नोट: ${esc(r.note)}</p>`:''}<div class="actions"><button class="danger small" type="button" data-delete="${r.id}">यह रिकॉर्ड हटाएँ</button></div></div></article>`;
+ }).join('');
+ list.querySelectorAll('[data-delete]').forEach(btn=>btn.addEventListener('click',async()=>{if(confirm('क्या यह रिकॉर्ड और उसकी फोटो हटानी है?')){await deleteRecord(btn.dataset.delete);await refresh();}}));
+}
+$('#saleForm').addEventListener('submit',async e=>{
+ e.preventDefault();const f=new FormData(e.currentTarget);
+ try{
+ const product=String(f.get('product')).trim(),qty=Number(f.get('qty')),price=Number(f.get('price')),cost=Number(f.get('cost')||0),cash=Number(f.get('cash')||0),online=Number(f.get('online')||0),due=Number(f.get('due')||0),total=qty*price;
+ if(!product||!Number.isInteger(qty)||qty<1||price<0||cost<0||cash<0||online<0||due<0)throw new Error('सभी विवरण सही भरें।');
+ if(Math.abs(cash+online+due-total)>0.005)throw new Error('कैश + ऑनलाइन + बाकी की रकम कुल बिक्री के बराबर होनी चाहिए।');
+ const labels={cash:'कैश',online:'ऑनलाइन / UPI',mixed:'कैश + ऑनलाइन',credit:'उधार / बाकी'};
+ await saveRecord({type:'sale',product,qty,price,cost,total,cash,online,due,payment:f.get('payment'),paymentLabel:labels[f.get('payment')],note:String(f.get('note')||'').trim(),image:await readImage(f.get('image')),createdAt:nowISO()});
+ e.currentTarget.reset();e.currentTarget.elements.qty.value=1;e.currentTarget.elements.cost.value=0;e.currentTarget.elements.cash.value=0;e.currentTarget.elements.online.value=0;e.currentTarget.elements.due.value=0;await refresh();alert('सेल हिस्ट्री में सेव हो गया।');
+ }catch(err){alert(err.message||'रिकॉर्ड सेव नहीं हुआ।');}
+});
+$('#stockForm').addEventListener('submit',async e=>{
+ e.preventDefault();const f=new FormData(e.currentTarget);
+ try{const product=String(f.get('product')).trim(),qty=Number(f.get('qty')),cost=Number(f.get('cost')||0);if(!product||!Number.isInteger(qty)||qty<1||cost<0)throw new Error('सही विवरण भरें।');
+ await saveRecord({type:'stock',product,qty,cost,image:await readImage(f.get('image')),note:'स्टॉक जोड़ा गया',createdAt:nowISO()});e.currentTarget.reset();e.currentTarget.elements.cost.value=0;await refresh();alert('स्टॉक हिस्ट्री में सेव हो गया।');
+ }catch(err){alert(err.message||'स्टॉक सेव नहीं हुआ।');}
+});
+$('#searchBox').addEventListener('input',refresh);$('#typeFilter').addEventListener('change',refresh);
+$('#clearBtn').addEventListener('click',async()=>{if(confirm('सावधान: सभी सेल, स्टॉक रिकॉर्ड और फोटो हमेशा के लिए हट जाएँगे। क्या जारी रखें?')&&confirm('आखिरी पुष्टि: सारी हिस्ट्री हटानी है?')){await clearRecords();await refresh();alert('हिस्ट्री हटा दी गई।');}});
+$('#exportBtn').addEventListener('click',async()=>{const records=await allRecords();if(!records.length){alert('डाउनलोड करने के लिए रिकॉर्ड नहीं है।');return;}const rows=[['प्रकार','तारीख','नाम','पीस','बिक्री कीमत','खरीद कीमत','कुल बिक्री','कैश','ऑनलाइन','बाकी','नोट','फोटो उपलब्ध']];records.forEach(r=>rows.push([r.type==='sale'?'सेल':'स्टॉक',dateText(r.createdAt),r.product,r.qty,r.price??'',r.cost??'',r.total??'',r.cash??'',r.online??'',r.due??'',r.note||'',r.image?'हाँ':'नहीं']));const csv='\uFEFF'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='kapda-dukan-hisab.csv';a.click();URL.revokeObjectURL(url);});
+(async()=>{try{await openDB();await refresh();}catch(e){$('#historyList').innerHTML='<div class="empty">लोकल स्टोरेज उपलब्ध नहीं है। Chrome में खोलकर कोशिश करें।</div>';alert('डेटाबेस शुरू नहीं हो सका। Chrome ब्राउज़र में खोलें।');}})();
+</script>
+</body></html>
